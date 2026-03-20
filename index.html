@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Zpeak TTS Demo</title>
+<style>
+    /* Apple-like clean UI */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f5f5f7;
+        color: #1c1c1e;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        padding: 40px 20px;
+    }
+
+    h2 {
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    textarea {
+        width: 100%;
+        max-width: 500px;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid #d1d1d6;
+        font-size: 16px;
+        resize: none;
+        margin-bottom: 20px;
+        background-color: #fff;
+    }
+
+    select, button {
+        padding: 10px 16px;
+        font-size: 16px;
+        border-radius: 12px;
+        border: 1px solid #d1d1d6;
+        margin: 5px 0;
+        cursor: pointer;
+    }
+
+    button {
+        background-color: #007aff;
+        color: white;
+        border: none;
+        transition: background 0.2s ease;
+    }
+
+    button:hover {
+        background-color: #005bb5;
+    }
+
+    audio {
+        margin-top: 20px;
+        width: 100%;
+        max-width: 500px;
+        border-radius: 12px;
+        outline: none;
+    }
+
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        max-width: 500px;
+        width: 100%;
+    }
+
+    label {
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+</style>
+
+<script type="module">
+import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/+esm";
+
+const voices = [
+    { name: "Aria — US Female Natural", code: "en-US-AriaNeural" },
+    { name: "Guy — US Male Natural", code: "en-US-GuyNeural" },
+    { name: "Jenny — US Female Friendly", code: "en-US-JennyNeural" },
+    { name: "Andrew — US Male Casual", code: "en-US-AndrewNeural" },
+    { name: "Sonia — UK Female Natural", code: "en-GB-SoniaNeural" },
+    { name: "Ryan — UK Male Natural", code: "en-GB-RyanNeural" },
+    { name: "Libby — UK Female Friendly", code: "en-GB-LibbyNeural" },
+    { name: "Natasha — AU Female Natural", code: "en-AU-NatashaNeural" },
+    { name: "William — AU Male Natural", code: "en-AU-WilliamNeural" },
+    { name: "Neerja — IN Female Natural", code: "en-IN-NeerjaNeural" },
+    { name: "Prabhat — IN Male Natural", code: "en-IN-PrabhatNeural" },
+    { name: "Asilia — KE Female Natural", code: "en-KE-AsiliaNeural" },
+    { name: "Chilemba — KE Male Natural", code: "en-KE-ChilembaNeural" },
+    { name: "Leah — ZA Female Natural", code: "en-ZA-LeahNeural" },
+    { name: "Luke — ZA Male Natural", code: "en-ZA-LukeNeural" },
+    { name: "Emily — IE Female Natural", code: "en-IE-EmilyNeural" },
+    { name: "Connor — IE Male Natural", code: "en-IE-ConnorNeural" }
+];
+
+window.addEventListener("DOMContentLoaded", () => {
+    const voiceSelect = document.getElementById("voice");
+    voices.forEach(v => {
+        const option = document.createElement("option");
+        option.value = v.code;
+        option.textContent = v.name;
+        voiceSelect.appendChild(option);
+    });
+});
+
+async function generateSpeech() {
+    const text = document.getElementById("text").value;
+    const voice = document.getElementById("voice").value;
+
+    const client = await Client.connect("JasonKishore007/Zpeak");
+
+    const result = await client.predict("/synthesize", [
+        text,
+        voice,
+        0,
+        0
+    ]);
+
+    console.log(result);
+
+    const audioURL = result.data[0].url;
+    const player = document.getElementById("audioPlayer");
+    player.src = audioURL;
+    player.play();
+}
+
+window.generateSpeech = generateSpeech;
+</script>
+</head>
+
+<body>
+
+<h2>Zpeak TTS Demo</h2>
+
+<div class="control-group">
+    <label for="text">Enter Text</label>
+    <textarea id="text" rows="4">This is Testing</textarea>
+</div>
+
+<div class="control-group">
+    <label for="voice">Select Voice</label>
+    <select id="voice"></select>
+</div>
+
+<button onclick="generateSpeech()">Generate Speech</button>
+
+<audio id="audioPlayer" controls></audio>
+
+</body>
+</html>
