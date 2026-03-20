@@ -78,32 +78,34 @@
 <script type="module">
 import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/+esm";
 
+// List of voices exactly as Gradio expects
 const voices = [
-    { name: "Aria — US Female Natural", code: "en-US-AriaNeural" },
-    { name: "Guy — US Male Natural", code: "en-US-GuyNeural" },
-    { name: "Jenny — US Female Friendly", code: "en-US-JennyNeural" },
-    { name: "Andrew — US Male Casual", code: "en-US-AndrewNeural" },
-    { name: "Sonia — UK Female Natural", code: "en-GB-SoniaNeural" },
-    { name: "Ryan — UK Male Natural", code: "en-GB-RyanNeural" },
-    { name: "Libby — UK Female Friendly", code: "en-GB-LibbyNeural" },
-    { name: "Natasha — AU Female Natural", code: "en-AU-NatashaNeural" },
-    { name: "William — AU Male Natural", code: "en-AU-WilliamNeural" },
-    { name: "Neerja — IN Female Natural", code: "en-IN-NeerjaNeural" },
-    { name: "Prabhat — IN Male Natural", code: "en-IN-PrabhatNeural" },
-    { name: "Asilia — KE Female Natural", code: "en-KE-AsiliaNeural" },
-    { name: "Chilemba — KE Male Natural", code: "en-KE-ChilembaNeural" },
-    { name: "Leah — ZA Female Natural", code: "en-ZA-LeahNeural" },
-    { name: "Luke — ZA Male Natural", code: "en-ZA-LukeNeural" },
-    { name: "Emily — IE Female Natural", code: "en-IE-EmilyNeural" },
-    { name: "Connor — IE Male Natural", code: "en-IE-ConnorNeural" }
+    "Aria — US Female, Natural",
+    "Guy — US Male, Natural",
+    "Jenny — US Female, Friendly",
+    "Andrew — US Male, Casual",
+    "Sonia — UK Female, Natural",
+    "Ryan — UK Male, Natural",
+    "Libby — UK Female, Friendly",
+    "Natasha — AU Female, Natural",
+    "William — AU Male, Natural",
+    "Neerja — IN Female, Natural",
+    "Prabhat — IN Male, Natural",
+    "Asilia — KE Female, Natural",
+    "Chilemba — KE Male, Natural",
+    "Leah — ZA Female, Natural",
+    "Luke — ZA Male, Natural",
+    "Emily — IE Female, Natural",
+    "Connor — IE Male, Natural"
 ];
 
+// Populate dropdown
 window.addEventListener("DOMContentLoaded", () => {
     const voiceSelect = document.getElementById("voice");
     voices.forEach(v => {
         const option = document.createElement("option");
-        option.value = v.code;
-        option.textContent = v.name;
+        option.value = v;  // send exact string to Gradio
+        option.textContent = v;
         voiceSelect.appendChild(option);
     });
 });
@@ -112,21 +114,26 @@ async function generateSpeech() {
     const text = document.getElementById("text").value;
     const voice = document.getElementById("voice").value;
 
-    const client = await Client.connect("JasonKishore007/Zpeak");
+    try {
+        const client = await Client.connect("JasonKishore007/Zpeak");
 
-    const result = await client.predict("/synthesize", [
-        text,
-        voice,
-        0,
-        0
-    ]);
+        const result = await client.predict("/synthesize", [
+            text,
+            voice,  // exact string
+            0,
+            0
+        ]);
 
-    console.log(result);
+        console.log(result);
 
-    const audioURL = result.data[0].url;
-    const player = document.getElementById("audioPlayer");
-    player.src = audioURL;
-    player.play();
+        const audioURL = result.data[0].url;
+        const player = document.getElementById("audioPlayer");
+        player.src = audioURL;
+        player.play();
+    } catch (err) {
+        console.error("Error generating speech:", err);
+        alert("Failed to generate speech. Please try again.");
+    }
 }
 
 window.generateSpeech = generateSpeech;
